@@ -1,8 +1,9 @@
 package com.hyflip.mod.commands
 
-import com.hyflip.mod.ExampleMod
+import com.hyflip.mod.HyflipMod
 import com.hyflip.mod.commands.SimpleCommand.ProcessCommandRunnable
 import com.hyflip.mod.utils.ChatUtils
+import io.github.notenoughupdates.moulconfig.GuiTextures
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.ClientCommandHandler
@@ -13,8 +14,9 @@ class CommandManager {
         registerCommand("testcommand") {
             ChatUtils.messageToChat("Test successful.")
         }
-        registerCommand("openconfig") {
-            ExampleMod.configManager.openConfigGui()
+        registerCommand("config") {
+            HyflipMod.configManager.openConfigGui()
+
         }
         registerCommand("formatmessage") { args ->
             val colorName = args.firstOrNull()

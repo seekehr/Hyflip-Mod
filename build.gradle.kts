@@ -113,6 +113,8 @@ loom {
         named("client") {
             client()
             property("mixin.debug", "true")
+            vmArgs("-Xmx4G", "-Xms4G", "-XX:MaxDirectMemorySize=512M", "-XX:MaxMetaspaceSize=256M", "-XX:ReservedCodeCacheSize=128M")
+            programArgs("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
         }
         named("server") {
             server()
