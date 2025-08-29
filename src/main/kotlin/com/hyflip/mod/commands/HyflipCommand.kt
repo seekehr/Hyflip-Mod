@@ -2,6 +2,7 @@ package com.hyflip.mod.commands
 
 import com.hyflip.mod.HyflipMod
 import com.hyflip.mod.errors.CommandError
+import com.hyflip.mod.server.ServerCommunicator
 import com.hyflip.mod.utils.ChatUtils
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender

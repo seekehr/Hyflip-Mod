@@ -75,7 +75,8 @@ dependencies {
         exclude(group = "org.jetbrains.kotlin")
     }
 
-    implementation("com.squareup.okhttp3:okhttp:5.1.0")
+    shadowImpl("com.squareup.okhttp3:okhttp:5.0.0-alpha.12")
+    shadowImpl("com.squareup.okhttp3:okhttp-sse:5.0.0-alpha.12")
 
     // Mixins
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {

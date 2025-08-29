@@ -21,7 +21,6 @@ class HyflipMod {
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent) {
         CommandManager()
-
     }
 
     // allows for static access in/of a class
