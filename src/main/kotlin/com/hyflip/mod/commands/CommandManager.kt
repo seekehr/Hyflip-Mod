@@ -1,9 +1,7 @@
 package com.hyflip.mod.commands
 
 import com.hyflip.mod.HyflipMod
-import com.hyflip.mod.commands.SimpleCommand.ProcessCommandRunnable
-import com.hyflip.mod.utils.ChatUtils
-import io.github.notenoughupdates.moulconfig.GuiTextures
+import com.hyflip.mod.commands.HyflipCommand.ProcessCommandRunnable
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.ClientCommandHandler
@@ -11,53 +9,24 @@ import net.minecraftforge.client.ClientCommandHandler
 class CommandManager {
 
     init {
-        registerCommand("testcommand") {
-            ChatUtils.messageToChat("Test successful.")
+        registerCommandWithTabCompletion("hyflip", HyflipCommand::execute) {
+            args -> listOf("help", "config", "ping")
         }
-        registerCommand("config") {
-            HyflipMod.configManager.openConfigGui()
-
-        }
-        registerCommand("formatmessage") { args ->
-            val colorName = args.firstOrNull()
-            if (colorName == null) {
-                ChatUtils.messageToChat("Error: Invalid usage: /formatmessage <color> <message>")
-            }
-            val colorCode = when (colorName) {
-                "red" -> "§c"
-                "blue" -> "§9"
-                "green" -> "§a"
-                "yellow" -> "§e"
-                "pink" -> "§d"
-                else -> {
-                    ChatUtils.messageToChat("Error: Invalid color '$colorName'!")
-                    return@registerCommand
-                }
-            }
-
-            val rest = args.drop(1)
-            if (rest.isEmpty()) {
-                ChatUtils.messageToChat("Error: Message can not be empty!")
-                return@registerCommand
-            }
-
-            ChatUtils.messageToChat(colorCode + rest.joinToString(" "))
+        registerCommandWithTabCompletion("hyf", HyflipCommand::execute) {
+                args -> listOf("help", "config", "ping")
         }
     }
 
-    private fun registerCommand(name: String, function: (Array<String>) -> Unit) {
-        ClientCommandHandler.instance.registerCommand(SimpleCommand(name, createCommand(function)))
-    }
 
-    private fun registerCommand0(
+    private fun registerCommandWithTabCompletion(
         name: String,
         function: (Array<String>) -> Unit,
         autoComplete: ((Array<String>) -> List<String>) = { listOf() }
     ) {
-        val command = SimpleCommand(
+        val command = HyflipCommand(
             name,
             createCommand(function),
-            object : SimpleCommand.TabCompleteRunnable {
+            object : HyflipCommand.TabCompleteRunnable {
                 override fun tabComplete(sender: ICommandSender?, args: Array<String>?, pos: BlockPos?): List<String> {
                     return autoComplete(args ?: emptyArray())
                 }

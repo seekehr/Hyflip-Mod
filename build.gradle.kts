@@ -59,10 +59,12 @@ val devenvMod: Configuration by configurations.creating {
 }
 
 dependencies {
-    // Annotation processors for Mixins
+    compileOnly("org.projectlombok:lombok:1.18.30")
+    // Annotation processors
     annotationProcessor("com.google.code.gson:gson:2.2.4")
     annotationProcessor("com.google.guava:guava:17.0")
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
+    annotationProcessor("org.projectlombok:lombok:1.18.30")
 
     minecraft("com.mojang:minecraft:1.8.9")
     mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
@@ -72,6 +74,8 @@ dependencies {
     shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") {
         exclude(group = "org.jetbrains.kotlin")
     }
+
+    implementation("com.squareup.okhttp3:okhttp:5.1.0")
 
     // Mixins
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {

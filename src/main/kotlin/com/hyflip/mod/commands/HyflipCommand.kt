@@ -1,11 +1,14 @@
 package com.hyflip.mod.commands
 
+import com.hyflip.mod.HyflipMod
 import com.hyflip.mod.errors.CommandError
+import com.hyflip.mod.utils.ChatUtils
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos
+import net.minecraft.util.EnumChatFormatting
 
-class SimpleCommand : CommandBase {
+class HyflipCommand : CommandBase {
     private val commandName: String
     private val runnable: ProcessCommandRunnable
     private var tabRunnable: TabCompleteRunnable? = null
@@ -19,6 +22,27 @@ class SimpleCommand : CommandBase {
         this.commandName = commandName
         this.runnable = runnable
         this.tabRunnable = tabRunnable
+    }
+
+    // we need
+    companion object {
+        fun execute(args: Array<String>) : Unit {
+            if (args.isEmpty()) {
+                HyflipMod.configManager.openConfigGui()
+                return
+            }
+
+            when (args[0]) {
+                "config" -> HyflipMod.configManager.openConfigGui()
+                "ping" -> PingCommand.execute(args)
+                "help" -> {
+                    val helpMessage = EnumChatFormatting.YELLOW.toString() + EnumChatFormatting.BOLD.toString() + "=== Hyflip ===" +
+                            "\n" + EnumChatFormatting.GREEN.toString() + "-> config - Open the settings menu." +
+                            "\n" + EnumChatFormatting.GREEN.toString() + "-> ping - Ping the backend server to check connectivity/speed."
+                    ChatUtils.sendMessage(helpMessage)
+                }
+            }
+        }
     }
 
     abstract class ProcessCommandRunnable {
@@ -38,7 +62,7 @@ class SimpleCommand : CommandBase {
     }
 
     override fun getCommandUsage(sender: ICommandSender): String {
-        return "/$commandName"
+        return "/$commandName help"
     }
 
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
