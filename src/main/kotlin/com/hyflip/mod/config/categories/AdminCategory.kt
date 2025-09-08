@@ -24,6 +24,6 @@ class AdminCategory {
     @ConfigOption(name = "Sync Config", desc = "Click to pull your config from the backend IF you made changes on the website.")
     @ConfigEditorButton(buttonText = "Sync")
     var syncConfig: Runnable = Runnable {
-        ChatUtils.sendMessage("Good boy")
+        ChatUtils.sendMessage("Good boy", true)
     }
 }

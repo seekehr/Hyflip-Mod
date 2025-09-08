@@ -36,11 +36,13 @@ class HyflipCommand : CommandBase {
             when (args[0]) {
                 "config" -> HyflipMod.configManager.openConfigGui()
                 "ping" -> PingCommand.execute(args)
+                "bzf" -> FindBzFlipsCommand.execute(args)
                 "help" -> {
                     val helpMessage = EnumChatFormatting.YELLOW.toString() + EnumChatFormatting.BOLD.toString() + "=== Hyflip ===" +
                             "\n" + EnumChatFormatting.GREEN.toString() + "-> config - Open the settings menu." +
                             "\n" + EnumChatFormatting.GREEN.toString() + "-> ping - Ping the backend server to check connectivity/speed."
-                    ChatUtils.sendMessage(helpMessage)
+                            "\n" + EnumChatFormatting.GREEN.toString() + "-> bzf - Send bz flips in chat. Optionally, use /hyflip bzf <token> for development purposes."
+                    ChatUtils.sendMessage(helpMessage, true)
                 }
             }
         }

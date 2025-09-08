@@ -29,11 +29,11 @@ class PingCommand {
 
                 ChatUtils.sendMessage(
                     EnumChatFormatting.GREEN.toString() +
-                            "Connected! Ping: " + EnumChatFormatting.DARK_PURPLE + "${time}ms."
+                            "Connected! Ping: " + EnumChatFormatting.DARK_PURPLE + "${time}ms.", true
                 )
             } catch (e: Exception) {
                 ChatUtils.sendMessage(
-                    EnumChatFormatting.RED.toString() + "Not connected to Hyflip server."
+                    EnumChatFormatting.RED.toString() + "Not connected to Hyflip server.", true
                 )
                 println("Hyflip Connection exception: $e")
             }

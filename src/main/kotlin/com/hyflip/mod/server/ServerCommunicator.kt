@@ -4,13 +4,16 @@ import kotlin.text.get
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.hyflip.mod.server.ServerCommunicator.FoundFlip
+import com.hyflip.mod.utils.ChatUtils
 import kotlinx.coroutines.suspendCancellableCoroutine
+import net.minecraft.client.Minecraft
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.sse.EventSource
 import okhttp3.sse.EventSourceListener
 import okhttp3.sse.EventSources
+import scala.collection.parallel.ParIterableLike
 import java.io.Closeable
 import java.io.IOException
 import kotlin.coroutines.resume
@@ -47,6 +50,9 @@ suspend fun Call.await(): Response {
 
 object ServerCommunicator {
     class ApiError(val status: Int, override val message: String) : Exception(message)
+    class FlipInProgressError(val status: Int, override val message: String): Exception(message)
+
+    var bazaarFlipInProgress = false
 
     // Note: No need for @Serializable with Gson
     data class ServerResponse<T>(
@@ -114,9 +120,13 @@ object ServerCommunicator {
         return response["key"] ?: throw ApiError(500, "Unexpected response format. Expected an object with a \"key\" property.")
     }
 
-    fun getBazaarFlips(token: String, username: String, onFoundFlip: OnFoundFlipCallback): Closeable {
+    fun getBazaarFlips(token: String, username: String, onFoundFlip: OnFoundFlipCallback, onComplete: () -> Unit, onFailure: (t: Throwable?) -> Unit): Closeable {
+        if (bazaarFlipInProgress) {
+            throw FlipInProgressError(400, "Bazaar flip is in progress.")
+        }
+
         val request = Request.Builder()
-            .url("${BACKEND_URL}api/bzflips?username=$username")
+            .url("${BACKEND_URL}/api/bzflips?username=$username")
             .header("Authorization", "Bearer $token")
             .build()
 
@@ -124,20 +134,30 @@ object ServerCommunicator {
             override fun onEvent(eventSource: EventSource, id: String?, type: String?, data: String) {
                 try {
                     val flip: FoundFlip = jsonParser.fromJson(data, FoundFlip::class.java)
-                    onFoundFlip(flip)
+                    Minecraft.getMinecraft().addScheduledTask { // we need this so the okhttp thread does not have to rely on our gameloop
+                        onFoundFlip(flip)
+                    }
                 } catch (e: Exception) {
                     println("Error parsing flip data: ${e.message}")
                 }
             }
 
+            override fun onClosed(eventSource: EventSource) {
+                bazaarFlipInProgress = false
+                Minecraft.getMinecraft().addScheduledTask {
+                    onComplete() // does UI operations so also part of game loop
+                }
+                super.onClosed(eventSource)
+            }
+
             override fun onFailure(eventSource: EventSource, t: Throwable?, response: Response?) {
-                println("EventSource failed: ${t?.message}")
-                // The library will attempt to reconnect automatically
+                bazaarFlipInProgress = false
+                onFailure(t)
             }
         }
 
         val eventSource = EventSources.createFactory(client).newEventSource(request, listener)
-
+        bazaarFlipInProgress = true
         // Return a Closeable that cancels the EventSource. Use it to cancel over > retries
         return Closeable { eventSource.cancel() }
     }
