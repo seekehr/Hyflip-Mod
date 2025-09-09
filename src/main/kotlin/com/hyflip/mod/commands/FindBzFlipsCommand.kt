@@ -40,7 +40,6 @@ class FindBzFlipsCommand {
                     token,
                     Minecraft.getMinecraft().thePlayer.name,
                     onFoundFlip = { flip ->
-                        println("hello")
                         BazaarFlipsPaginator.addFlip(flip)
                         if (BazaarFlipsPaginator.size() == 20 && !firstFlipPageShown) {
                             BazaarFlipsPaginator.sendFirstPageInChat()

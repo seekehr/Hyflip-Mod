@@ -1,12 +1,13 @@
 package com.hyflip.mod.utils
 
 import com.hyflip.mod.server.ServerCommunicator.FoundFlip
-import com.hyflip.mod.utils.ChatUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
+import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
+import kotlin.math.floor
 
 object BazaarFlipsPaginator {
     private val flips = mutableListOf<FoundFlip>()
@@ -24,7 +25,7 @@ object BazaarFlipsPaginator {
 
     fun size(): Int = flips.size
 
-    fun sendPageInChat(page: Int) {
+    fun sendPageInChat(page: Int, firstPage: Boolean = false) {
         if (flips.isEmpty()) {
             ChatUtils.sendMessage(EnumChatFormatting.RED.toString() + "No flips loaded yet.", true)
             return
@@ -46,26 +47,48 @@ object BazaarFlipsPaginator {
             val flip = flips[i]
             val msg = ChatComponentText(
                 "${EnumChatFormatting.YELLOW}[${i + 1}] " +
-                        "${EnumChatFormatting.GREEN}${flip.productId} " +
-                        "${EnumChatFormatting.GRAY}Buy: ${flip.buyPrice} → Sell: ${flip.sellPrice}"
+                        "${EnumChatFormatting.LIGHT_PURPLE}${EnumChatFormatting.BOLD}${flip.productId} " +
+                        "${EnumChatFormatting.DARK_AQUA}Buy: ${EnumChatFormatting.WHITE}${EnumChatFormatting.BOLD}${ItemUtils.formatPrice(flip.buyPrice)}" +
+                        " ${EnumChatFormatting.RESET}→ " +
+                        "${EnumChatFormatting.DARK_AQUA}Sell: ${EnumChatFormatting.WHITE}${EnumChatFormatting.BOLD}${ItemUtils.formatPrice(flip.sellPrice)}${EnumChatFormatting.RESET}"
             )
+
+            println(msg)
+
+            val searchableItemName = ItemUtils.convertItemIdToSearchableName(flip.productId)
+            msg.chatStyle = ChatStyle()
+                .setChatHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText(
+                    EnumChatFormatting.GREEN.toString() + EnumChatFormatting.BOLD + "SellVol" +  " » " + EnumChatFormatting.YELLOW + EnumChatFormatting.BOLD + flip.sellVolume + "\n" +
+                            EnumChatFormatting.GREEN.toString() + EnumChatFormatting.BOLD + "BuyVol" +  " » "  + EnumChatFormatting.YELLOW + EnumChatFormatting.BOLD + flip.buyVolume + "\n" +
+                            EnumChatFormatting.GREEN.toString() + EnumChatFormatting.BOLD + "SellMovWeek" +  " » " + EnumChatFormatting.YELLOW + EnumChatFormatting.BOLD + flip.sellMovingWeek + "\n" +
+                            EnumChatFormatting.GREEN.toString() + EnumChatFormatting.BOLD + "BuyMovWeek" +  " » " + EnumChatFormatting.YELLOW + EnumChatFormatting.BOLD + flip.buyMovingWeek + "\n" +
+                            EnumChatFormatting.GREEN.toString() + EnumChatFormatting.BOLD + "RecommendedVolFlip" +  " » " + EnumChatFormatting.YELLOW + EnumChatFormatting.BOLD + flip.recommendedFlipVolume + "\n" +
+                            EnumChatFormatting.GREEN.toString() + EnumChatFormatting.BOLD + "RecommendedVolFlipProfit" +  " » " + EnumChatFormatting.YELLOW + EnumChatFormatting.BOLD + flip.profitFromRecommendedFlipVolume
+                )))
+                .setChatClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/bzs $searchableItemName"))
+
             Minecraft.getMinecraft().thePlayer.addChatMessage(msg)
         }
 
         val buttonLine = ChatComponentText("")
         if (page > 1) {
-            val prev = ChatComponentText("${EnumChatFormatting.RED}<<< ")
+            val prev = ChatComponentText("${EnumChatFormatting.RED}«««")
             prev.chatStyle = ChatStyle().setChatClickEvent(
                 ClickEvent(ClickEvent.Action.RUN_COMMAND, "/hyf bzf page ${page - 1}")
             )
             buttonLine.appendSibling(prev)
         }
 
-        val pageText = ChatComponentText("${EnumChatFormatting.AQUA}Page $page/$maxPage")
+        val pageText: ChatComponentText = if (firstPage) {
+            ChatComponentText("${EnumChatFormatting.AQUA}Page $page/??")
+        } else {
+            ChatComponentText("${EnumChatFormatting.AQUA}Page $page/$maxPage")
+        }
+
         buttonLine.appendSibling(pageText)
 
         if (page < maxPage) {
-            val next = ChatComponentText("${EnumChatFormatting.GREEN} >>>")
+            val next = ChatComponentText("${EnumChatFormatting.GREEN} »»»")
             next.chatStyle = ChatStyle().setChatClickEvent(
                 ClickEvent(ClickEvent.Action.RUN_COMMAND, "/hyf bzf page ${page + 1}")
             )
@@ -78,6 +101,6 @@ object BazaarFlipsPaginator {
 
 
     fun sendFirstPageInChat() {
-        sendPageInChat(1)
+        sendPageInChat(1, true)
     }
 }
