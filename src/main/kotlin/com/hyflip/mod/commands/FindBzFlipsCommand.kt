@@ -1,5 +1,6 @@
 package com.hyflip.mod.commands
 
+import com.hyflip.mod.HyflipMod
 import com.hyflip.mod.server.ServerCommunicator
 import com.hyflip.mod.server.ServerCommunicator.FoundFlip
 import com.hyflip.mod.utils.BazaarFlipsPaginator
@@ -18,6 +19,11 @@ class FindBzFlipsCommand {
                 return
             }
 
+            val token = HyflipMod.config.adminCategory.token
+            if (token == "") {
+                ChatUtils.sendMessage(EnumChatFormatting.RED.toString() + "Set your token before trying to flip, using /hyf set <token>.", true)
+            }
+
             if (args.size > 2) {
                 if (args[1].equals("page", ignoreCase = true)) {
                     val page = args[2].toIntOrNull()
@@ -29,8 +35,6 @@ class FindBzFlipsCommand {
                     return
                 }
             }
-
-            val token = "780c1b25-d94e-48fb-8220-e436df1fd17e"
 
             try {
                 var firstFlipPageShown = false

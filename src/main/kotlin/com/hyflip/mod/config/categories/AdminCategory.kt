@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose
 import com.hyflip.mod.utils.ChatUtils
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class AdminCategory {
@@ -26,4 +27,8 @@ class AdminCategory {
     var syncConfig: Runnable = Runnable {
         ChatUtils.sendMessage("Good boy", true)
     }
+
+    @JvmField
+    @Expose
+    var token: String = ""
 }
